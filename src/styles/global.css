@@ -1,0 +1,1051 @@
+:root {
+  --bg: #0f1114;
+  --bg-2: #15181d;
+  --bg-3: #1b1f26;
+  --bg-4: #232832;
+  --line: #2a2f39;
+  --line-2: #353c49;
+  --ink: #eef1f5;
+  --ink-2: #9aa4b2;
+  --ink-3: #8d97a6;
+  --accent: #8a4fe0;
+  --accent-2: #2ade72;
+  --warn: #f2c14e;
+  --error: #ff6b6b;
+  --radius: 10px;
+  --radius-lg: 14px;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root { height: 100%; margin: 0; }
+#root { overflow: auto; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 13px;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+button, input, textarea, select { font: inherit; color: inherit; }
+button { cursor: pointer; border: none; background: none; padding: 0; }
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--line-2); border-radius: 6px; border: 3px solid var(--bg-2); }
+::-webkit-scrollbar-thumb:hover { background: #46506100; background-color: #4a5464; }
+
+/* ------------------------------------------------------------------ shell */
+
+.app {
+  display: grid;
+  grid-template-rows: 52px 1fr;
+  /* 440px is the inspector width the Figma panel is drawn at */
+  grid-template-columns: 228px minmax(360px, 1fr) 440px;
+  grid-template-areas: 'top top top' 'strip canvas inspector';
+  height: 100%;
+  /* below this the three columns stop being workable — scroll instead of squash */
+  min-width: 1280px;
+}
+
+@media (max-width: 1360px) {
+  .app { grid-template-columns: 196px minmax(320px, 1fr) 400px; min-width: 1180px; }
+}
+
+.topbar {
+  grid-area: top;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  background: var(--bg-2);
+  border-bottom: 1px solid var(--line);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-right: 10px;
+  margin-right: 2px;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+  white-space: nowrap;
+}
+.brand .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent-2); }
+
+.strip {
+  grid-area: strip;
+  background: var(--bg-2);
+  border-right: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.canvas-wrap {
+  grid-area: canvas;
+  position: relative;
+  overflow: auto;
+  background:
+    radial-gradient(1200px 600px at 50% 0%, #181c22 0%, var(--bg) 70%);
+  display: grid;
+  place-items: center;
+  padding: 28px;
+}
+
+.inspector {
+  grid-area: inspector;
+  background: var(--bg-2);
+  border-left: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* ---------------------------------------------------------------- widgets */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 11px;
+  border-radius: 8px;
+  background: var(--bg-4);
+  color: var(--ink);
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background 0.12s, opacity 0.12s;
+}
+.btn:hover { background: #2b3139; }
+.btn:disabled { opacity: 0.35; cursor: default; }
+.btn.ghost { background: transparent; color: var(--ink-2); }
+.btn.ghost:hover { background: var(--bg-3); color: var(--ink); }
+.btn.primary { background: var(--accent); color: #fff; }
+.btn.primary:hover { background: #a876f0; }
+.btn.danger:hover { background: #3a2227; color: var(--error); }
+.btn.icon { width: 30px; padding: 0; }
+.btn.sm { height: 26px; padding: 0 9px; font-size: 12px; }
+.btn.icon.sm { width: 24px; padding: 0; font-size: 12px; }
+
+.field {
+  display: block;
+  width: 100%;
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 8px;
+  background: var(--bg-3);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  font-size: 13px;
+}
+.field:focus { border-color: var(--accent); }
+textarea.field {
+  height: auto;
+  min-height: 72px;
+  padding: 9px 10px;
+  line-height: 1.45;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.seg {
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  background: var(--bg-3);
+  border-radius: 9px;
+  border: 1px solid var(--line);
+}
+.seg button {
+  flex: 1;
+  height: 26px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-2);
+  padding: 0 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.seg button[aria-pressed='true'] { background: var(--bg-4); color: var(--ink); }
+.seg button:hover { color: var(--ink); }
+
+.row { display: flex; align-items: center; gap: 8px; }
+.row.between { justify-content: space-between; }
+.col { display: flex; flex-direction: column; gap: 8px; }
+
+.label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.section {
+  padding: 14px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.section:last-child { border-bottom: none; }
+
+.hint { font-size: 12.5px; color: var(--ink-3); line-height: 1.45; }
+
+input[type='range'] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 18px;
+  background: transparent;
+}
+input[type='range']::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 3px;
+  background: var(--line-2);
+}
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  margin-top: -5px;
+  border-radius: 50%;
+  background: var(--ink);
+  border: none;
+}
+
+/* ------------------------------------------------------------------ strip */
+
+.strip-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+}
+.strip-list {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.strip-item {
+  position: relative;
+  /* without this the cards shrink instead of the list scrolling, and every
+     thumbnail gets cropped — worse the longer the carousel */
+  flex: 0 0 auto;
+  user-select: none;
+  border-radius: var(--radius);
+  border: 2px solid transparent;
+  background: var(--bg-3);
+  overflow: hidden;
+  cursor: pointer;
+}
+.strip-item[aria-selected='true'] { border-color: var(--accent); }
+.strip-item[data-dragging] { opacity: 0.35; }
+.strip-item[data-drop='before']::before,
+.strip-item[data-drop='after']::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--accent);
+  z-index: 3;
+}
+.strip-item[data-drop='before']::before { top: -6px; }
+.strip-item[data-drop='after']::after { bottom: -6px; }
+.strip-item .num {
+  position: absolute;
+  left: 6px;
+  top: 6px;
+  z-index: 2;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 6px;
+  background: rgba(10, 12, 15, 0.72);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  backdrop-filter: blur(4px);
+}
+.strip-item .badge {
+  position: absolute;
+  right: 6px;
+  top: 6px;
+  z-index: 2;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  font-weight: 800;
+  color: #16181c;
+}
+.strip-item .tools {
+  position: absolute;
+  inset: auto 0 0 0;
+  z-index: 2;
+  display: flex;
+  gap: 4px;
+  padding: 5px;
+  background: linear-gradient(180deg, rgba(10, 12, 15, 0), rgba(10, 12, 15, 0.86));
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+.strip-item:hover .tools,
+.strip-item:focus-within .tools { opacity: 1; }
+.strip-item .tools button {
+  flex: 1;
+  height: 22px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+}
+.strip-item .tools button:hover { background: rgba(255, 255, 255, 0.28); }
+
+.strip-foot {
+  margin: 0;
+  padding: 8px 12px 10px;
+  border-top: 1px solid var(--line);
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--ink-3);
+}
+
+.thumb-frame { position: relative; overflow: hidden; }
+.thumb-scaler { transform-origin: top left; }
+
+/* -------------------------------------------------------------- inspector */
+
+.panel { flex: 1; overflow: auto; display: flex; flex-direction: column; }
+
+.block-row {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 8px 8px 8px 10px;
+  border-radius: 9px;
+  background: var(--bg-3);
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+.block-row[aria-selected='true'] { border-color: var(--accent); background: var(--bg-4); }
+.block-row .t { flex: 1; min-width: 0; margin-right: 4px; }
+.block-row .t b { display: block; font-size: 12px; font-weight: 700; }
+.block-row .t span {
+  display: block;
+  font-size: 12px;
+  color: var(--ink-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sub-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  background: var(--bg-3);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+/* ------------------------------------------- dragging a block on the slide */
+
+.block-drop-line {
+  position: absolute;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--accent);
+  box-shadow: 0 0 0 4px rgba(154, 98, 235, 0.22);
+  pointer-events: none;
+  z-index: 4;
+}
+
+.issue {
+  display: flex;
+  gap: 8px;
+  padding: 9px 10px;
+  border-radius: 9px;
+  background: var(--bg-3);
+  border: 1px solid var(--line-2);
+  cursor: pointer;
+  line-height: 1.4;
+}
+.issue.error { border-color: rgba(255, 107, 107, 0.5); background: rgba(255, 107, 107, 0.08); }
+.issue.warn { border-color: rgba(242, 193, 78, 0.45); background: rgba(242, 193, 78, 0.07); }
+.issue b { font-weight: 700; font-size: 12px; }
+.issue span { display: block; color: rgba(255, 255, 255, 0.66); font-size: 12px; margin-top: 3px; }
+
+.ok-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--ink-3);
+}
+.ok-state .big { font-size: 28px; }
+
+/* ----------------------------------------------------------------- canvas */
+
+.stage { position: relative; transform-origin: center center; }
+.stage-shadow {
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+/* Patterns are placed by name, so this layer only picks one — and it is
+   clipped to the slide, which is why no selection frame can stick out. */
+.pattern-layer { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.pattern-pick {
+  position: absolute;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  transform-origin: center;
+  pointer-events: auto;
+  background: transparent;
+  cursor: pointer;
+}
+.pattern-pick:hover { border-color: rgba(255, 255, 255, 0.45); }
+.pattern-pick[aria-selected='true'] { border-color: #fff; }
+.pattern-pick:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
+
+
+
+.overflow-flag {
+  position: absolute;
+  left: 50%;
+  bottom: -30px;
+  transform: translateX(-50%);
+  background: var(--error);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 8px;
+  white-space: nowrap;
+}
+
+.drop-veil {
+  position: absolute;
+  inset: 12px;
+  border: 2px dashed var(--accent);
+  border-radius: 14px;
+  background: rgba(154, 98, 235, 0.12);
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  color: var(--ink);
+  pointer-events: none;
+  z-index: 5;
+}
+
+.canvas-hint {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: rgba(21, 24, 29, 0.9);
+  border: 1px solid var(--line);
+  color: var(--ink-3);
+  font-size: 12px;
+  font-weight: 600;
+  pointer-events: none;
+  backdrop-filter: blur(6px);
+}
+
+.zoombar {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  background: rgba(21, 24, 29, 0.92);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  backdrop-filter: blur(8px);
+}
+
+/* ------------------------------------------------------------------ modal */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 9, 11, 0.7);
+  display: grid;
+  place-items: center;
+  z-index: 50;
+  padding: 24px;
+  backdrop-filter: blur(3px);
+}
+.modal {
+  width: min(960px, 100%);
+  max-height: 86vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.6);
+}
+.modal header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--line);
+}
+.modal header h2 { margin: 0; font-size: 15px; font-weight: 800; }
+.modal .body { padding: 18px; overflow: auto; }
+.modal footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 18px;
+  border-top: 1px solid var(--line);
+}
+
+.tpl-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+  gap: 14px;
+}
+.tpl {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--bg-3);
+  transition: border-color 0.12s, transform 0.12s;
+}
+.tpl:hover { border-color: var(--accent); transform: translateY(-2px); }
+.tpl .preview {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  background: #fff;
+}
+.tpl b { font-size: 12.5px; }
+.tpl span { font-size: 12px; color: var(--ink-3); line-height: 1.35; }
+
+.pattern-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.pattern-card {
+  aspect-ratio: 4 / 3;
+  border-radius: 9px;
+  background: var(--bg-3);
+  border: 1px solid var(--line);
+  display: grid;
+  place-items: center;
+  padding: 6px;
+}
+.pattern-card {
+  aspect-ratio: auto;
+  grid-template-rows: 1fr auto;
+  gap: 4px;
+}
+.pattern-card > svg { height: 46px; }
+.pattern-card em {
+  font-style: normal;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.66);
+  line-height: 1.2;
+}
+.pattern-card:hover { border-color: #fff; }
+
+.theme-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.theme-card {
+  border-radius: 9px;
+  border: 2px solid transparent;
+  overflow: hidden;
+  background: var(--bg-3);
+  padding: 0;
+}
+.theme-card[aria-pressed='true'] { border-color: var(--ink); }
+.theme-card .sw { height: 34px; display: flex; }
+.theme-card .sw i { flex: 1; }
+.theme-card em { display: block; font-size: 12px; font-style: normal; padding: 4px 2px; color: var(--ink-2); }
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  background: var(--bg-4);
+  border: 1px solid var(--line-2);
+  color: var(--ink);
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 12.5px;
+  font-weight: 600;
+  z-index: 100;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.kbd {
+  display: inline-block;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--bg-4);
+  border: 1px solid var(--line-2);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--ink-2);
+}
+
+.splash {
+  height: 100%;
+  display: grid;
+  place-items: center;
+  color: var(--ink-3);
+  font-weight: 600;
+}
+
+/* --------------------------------------------------- autosave indicator */
+
+.save-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-right: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.save-state i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.save-state[data-state='saved'] i { background: var(--accent-2); }
+.save-state[data-state='saving'] { color: var(--ink-3); }
+.save-state[data-state='failed'] { color: var(--error); }
+
+/* a replace-everything warning should read like one */
+.warn-line {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin: 0;
+  padding: 9px 11px;
+  border-radius: var(--radius);
+  background: rgba(242, 193, 78, 0.1);
+  border: 1px solid rgba(242, 193, 78, 0.3);
+  color: var(--warn);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+/* ======================================================================
+   Inspector — Figma «dsgn-drafts» 1111:39572
+   One selected-state token across the whole panel: a 1px white ring held
+   2px off the control, exactly as the swatches are drawn in the design.
+   ====================================================================== */
+
+.inspector {
+  /* bg-2 with the design's rgba(0,144,255,0.04) wash flattened in */
+  background: #141d26;
+  --ins-line: rgba(255, 255, 255, 0.1);
+  --ins-fill: rgba(0, 144, 255, 0.1);
+  --ins-fill-hi: rgba(0, 144, 255, 0.22);
+  --ins-mute: rgba(255, 255, 255, 0.52);
+}
+
+.inspector :focus-visible {
+  outline: 2px solid var(--accent-2);
+  outline-offset: 2px;
+}
+
+/* ------------------------------------------------------------- tab bar */
+
+.ins-tabs {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 40px;
+  padding-right: 16px;
+  border-bottom: 1px solid var(--ins-line);
+  flex: 0 0 auto;
+}
+.ins-tabs-row { display: flex; align-items: stretch; height: 100%; min-width: 0; }
+
+.ins-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  /* four labels plus the «Проверка» badge have to fit a 342px row */
+  padding: 0 10px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 16px;
+  color: #fff;
+  position: relative;
+  white-space: nowrap;
+}
+.ins-tab::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: #d9d9d9;
+  opacity: 0;
+}
+.ins-tab[aria-pressed='true']::after { opacity: 1; }
+.ins-tab:hover { background: rgba(255, 255, 255, 0.04); }
+
+.ins-pill {
+  min-width: 17px;
+  height: 17px;
+  padding: 0 5px;
+  border-radius: 9px;
+  font-size: 11px;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  color: #101820;
+}
+.ins-pill[data-kind='error'] { background: var(--error); }
+.ins-pill[data-kind='warn'] { background: var(--warn); }
+
+/* --------------------------------------------------------------- chips */
+
+.ins-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.ins-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 28px;
+  padding: 0 12px 0 8px;
+  border-radius: 4px;
+  background: var(--ins-fill);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 16px;
+  white-space: nowrap;
+  transition: background 0.12s, box-shadow 0.12s;
+}
+.ins-chip:hover { background: var(--ins-fill-hi); }
+.ins-chip[aria-pressed='true'] {
+  background: var(--ins-fill-hi);
+  box-shadow: 0 0 0 2px #141d26, 0 0 0 3px #fff;
+}
+.ins-chip img { display: block; flex: 0 0 auto; }
+
+.ins-icon {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  background: var(--ins-fill);
+  color: #fff;
+  flex: 0 0 auto;
+  transition: background 0.12s, opacity 0.12s;
+}
+.ins-icon:hover { background: var(--ins-fill-hi); }
+.ins-icon:disabled { opacity: 0.3; cursor: default; }
+.ins-icon svg { display: block; }
+
+/* -------------------------------------------------------------- blocks */
+
+.ins-list { display: flex; flex-direction: column; padding: 24px 0; flex: 1 0 auto; }
+
+.ins-block { display: flex; flex-direction: column; gap: 36px; padding: 0 24px; }
+.ins-block + .ins-block {
+  margin-top: 36px;
+  padding-top: 36px;
+  border-top: 1px solid var(--ins-line);
+}
+
+.ins-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.ins-name {
+  font-size: 12px;
+  line-height: 14px;
+  text-transform: uppercase;
+  color: var(--ins-mute);
+  white-space: nowrap;
+}
+.ins-acts { display: flex; align-items: center; gap: 12px; }
+.ins-acts-group { display: flex; align-items: center; gap: 4px; }
+
+/* the header and the block's own field read as one card */
+.ins-head + .ins-sec { margin-top: -24px; }
+
+.ins-sec { display: flex; flex-direction: column; gap: 8px; }
+.ins-label { font-size: 14px; font-weight: 600; line-height: 16px; color: #fff; }
+
+.ins-field {
+  display: block;
+  width: 100%;
+  min-height: 100px;
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: transparent;
+  color: #fff;
+  font-family: inherit;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 22px;
+  resize: vertical;
+}
+/* the block's own fields read at 16px — the 20px of the mock is the slide's
+   voice, not the panel's */
+.ins-block input,
+.ins-block textarea { font-size: 16px; line-height: 20px; }
+
+.ins-field.short { min-height: 54px; }
+.ins-field.one-line { min-height: 0; height: 54px; resize: none; }
+.ins-field::placeholder { color: rgba(255, 255, 255, 0.45); font-weight: 400; }
+.ins-field:focus { border-color: #fff; }
+
+.ins-note { margin: 0; font-size: 12px; line-height: 1.45; color: rgba(255, 255, 255, 0.66); }
+.ins-over { margin: 0; font-size: 12px; line-height: 1.45; color: var(--warn); }
+
+/* ---------------------------------------------------------------- type */
+
+.ins-fonts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.ins-font {
+  display: grid;
+  grid-template-columns: 42px 1fr;
+  align-items: center;
+  gap: 10px;
+  min-height: 64px;
+  padding: 8px 12px 8px 10px;
+  border-radius: 8px;
+  background: #fff;
+  color: #101820;
+  text-align: left;
+  overflow: hidden;
+  transition: box-shadow 0.12s;
+}
+.ins-font[aria-pressed='true'] { box-shadow: 0 0 0 2px #141d26, 0 0 0 3px #fff; }
+.ins-font .sample {
+  display: block;
+  text-align: center;
+  line-height: 1;
+  white-space: nowrap;
+}
+.ins-font .name { font-size: 13px; font-weight: 600; line-height: 1.25; }
+
+/* ------------------------------------------------------------ swatches */
+
+.ins-swatches { display: flex; flex-wrap: wrap; gap: 4px; }
+.ins-swatch {
+  width: 40px;
+  height: 40px;
+  padding: 2px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  display: block;
+}
+.ins-swatch[aria-pressed='true'] { border-color: #fff; }
+.ins-swatch i {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+/* ------------------------------------------------------- range + add bar */
+
+.ins-range { display: flex; align-items: center; gap: 12px; }
+.ins-range input { flex: 1; }
+.ins-range span {
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+
+.ins-add {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 16px 24px;
+  border-top: 1px solid var(--ins-line);
+  background: #141d26;
+  flex: 0 0 auto;
+}
+
+/* ----------------------------------------------------------------------
+   The other three tabs keep their structure but speak the panel's language:
+   one selected-state token, no eyebrow labels, nothing under 12px.
+   ---------------------------------------------------------------------- */
+
+.inspector .section {
+  padding: 20px 24px;
+  gap: 12px;
+  border-bottom-color: var(--ins-line);
+}
+
+.inspector .label {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: #fff;
+}
+
+.inspector .hint { font-size: 12px; color: rgba(255, 255, 255, 0.66); }
+
+.inspector .btn {
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 4px;
+  background: var(--ins-fill);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 400;
+}
+.inspector .btn:hover { background: var(--ins-fill-hi); }
+.inspector .btn.icon { width: 28px; padding: 0; }
+.inspector .btn.sm { height: 28px; font-size: 14px; }
+.inspector .btn.icon.sm { width: 24px; height: 24px; }
+.inspector .btn.ghost { background: transparent; color: rgba(255, 255, 255, 0.66); }
+.inspector .btn.ghost:hover { background: var(--ins-fill); color: #fff; }
+.inspector .btn[aria-pressed='true'] {
+  background: var(--ins-fill-hi);
+  box-shadow: 0 0 0 2px #141d26, 0 0 0 3px #fff;
+}
+
+.inspector .seg { background: transparent; border: none; padding: 0; gap: 8px; }
+.inspector .seg button {
+  height: 28px;
+  border-radius: 4px;
+  background: var(--ins-fill);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 400;
+}
+.inspector .seg button:hover { background: var(--ins-fill-hi); }
+.inspector .seg button[aria-pressed='true'] {
+  background: var(--ins-fill-hi);
+  box-shadow: 0 0 0 2px #141d26, 0 0 0 3px #fff;
+}
+
+.inspector .field {
+  height: 40px;
+  border-radius: 8px;
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.25);
+  font-size: 14px;
+}
+.inspector textarea.field { height: auto; padding: 10px 12px; }
+.inspector .field:focus { border-color: #fff; }
+
+.inspector .theme-card em { font-size: 12px; color: rgba(255, 255, 255, 0.66); }
+.inspector .theme-card[aria-pressed='true'] { border-color: #fff; }
+
+.inspector .block-row { background: var(--ins-fill); border-color: transparent; }
+.inspector .block-row[aria-selected='true'] {
+  background: var(--ins-fill-hi);
+  border-color: #fff;
+}
+.inspector .block-row .t span { color: rgba(255, 255, 255, 0.66); font-size: 12px; }
+
+.inspector .sub-card { background: var(--ins-fill); border-color: var(--ins-line); }
+.inspector .ok-state { color: rgba(255, 255, 255, 0.66); }
+
+/* ======================================================================
+   Keyboard and motion
+   ====================================================================== */
+
+/* one focus ring for the whole app — there used to be `outline: none` and
+   nothing to replace it with */
+:focus-visible {
+  outline: 2px solid var(--accent-2);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+.field:focus-visible,
+.ins-field:focus-visible { outline-offset: 0; }
+
+.btn:active:not(:disabled),
+.ins-chip:active,
+.ins-icon:active { transform: translateY(1px); }
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* the block name doubles as the explicit "pick this layer" control */
+button.ins-name {
+  padding: 2px 5px;
+  margin-left: -5px;
+  border-radius: 4px;
+  text-align: left;
+  transition: background 0.12s, color 0.12s, box-shadow 0.12s;
+}
+button.ins-name:hover { background: var(--ins-fill); color: #fff; }
+button.ins-name[aria-pressed='true'] {
+  color: #fff;
+  box-shadow: 0 0 0 2px #141d26, 0 0 0 3px #fff;
+}
+
+/* the stage takes focus on click so the arrow keys reach the selected layer;
+   it is not a tab stop, so it never shows a ring */
+.stage:focus { outline: none; }
+
+/* ----------------------------------------------------------------------
+   Narrow-column overrides. These must come after the rules they beat —
+   same specificity, so source order decides.
+   ---------------------------------------------------------------------- */
+
+@media (max-width: 1360px) {
+  /* the tab row and the grid toggle stop fitting side by side */
+  .ins-tab { padding: 0 8px; }
+  .ins-tabs > .ins-chip { padding: 0 6px; }
+  .ins-tabs > .ins-chip span { display: none; }
+  /* «Подзаголовок» is one unbreakable word and needs those pixels back */
+  .ins-font { padding: 8px; gap: 8px; grid-template-columns: 38px 1fr; }
+}
