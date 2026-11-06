@@ -3,6 +3,7 @@ import { importPhoto } from './lib/image'
 import { useEditor } from './store/useEditor'
 import { TopBar } from './ui/TopBar'
 import { SlideStrip } from './ui/SlideStrip'
+import { LayerList } from './ui/LayerList'
 import { Canvas } from './ui/Canvas'
 import { Inspector } from './ui/Inspector'
 import { TemplatePicker } from './ui/TemplatePicker'
@@ -174,6 +175,7 @@ export default function App() {
       />
       <SlideStrip onAdd={() => setDialog('templates')} />
       <Canvas />
+      <LayerList />
       <Inspector />
 
       {dialog === 'templates' ? <TemplatePicker onClose={() => setDialog(null)} /> : null}

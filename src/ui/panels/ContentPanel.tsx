@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { type ReactNode } from 'react'
 import { useEditor, useSlide } from '../../store/useEditor'
 import type {
   Block,
@@ -24,9 +24,7 @@ import {
   ArrowDownGlyph,
   ArrowUpGlyph,
   CapsIcon,
-  ChevronGlyph,
   CloseGlyph,
-  CopyGlyph,
   OpacityIcon,
 } from '../icons'
 
@@ -152,103 +150,15 @@ function TypePicker({
 export function ContentPanel() {
   const slide = useSlide()
   const selectedId = useEditor((s) => s.sel.blockId)
-  const selectBlock = useEditor((s) => s.selectBlock)
   const addBlock = useEditor((s) => s.addBlock)
-  const deleteBlock = useEditor((s) => s.deleteBlock)
-  const moveBlock = useEditor((s) => s.moveBlock)
-  const duplicateBlock = useEditor((s) => s.duplicateBlock)
-  const [shut, setShut] = useState<Record<string, boolean>>({})
-  const listRef = useRef<HTMLDivElement>(null)
-
-  // picking a block on the canvas should bring its card into view
-  useEffect(() => {
-    if (!selectedId) return
-    listRef.current
-      ?.querySelector(`[data-block="${selectedId}"]`)
-      ?.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
-  }, [selectedId])
-
   if (!slide) return null
+  const block = slide.blocks.find((b) => b.id === selectedId) ?? slide.blocks[0]
 
   return (
     <div className="panel">
-      <div className="ins-list" ref={listRef}>
-        {slide.blocks.length === 0 ? (
-          <p className="ins-note">Слайд пустой — добавьте блок внизу.</p>
-        ) : null}
-
-        {slide.blocks.map((b, i) => {
-          const open = !shut[b.id]
-          return (
-            <section key={b.id} className="ins-block" data-block={b.id}>
-              <header className="ins-head">
-                {/* selecting is an explicit act: tabbing through the card used
-                    to select it, and then an arrow key edited the slide */}
-                <button
-                  className="ins-name"
-                  aria-pressed={selectedId === b.id}
-                  title={
-                    selectedId === b.id
-                      ? 'Снять выделение'
-                      : 'Выделить блок на слайде'
-                  }
-                  onClick={() => selectBlock(selectedId === b.id ? null : b.id)}
-                >
-                  {i + 1}. {nameOf(b)}
-                </button>
-                <div className="ins-acts">
-                  <div className="ins-acts-group">
-                    <button
-                      className="ins-icon"
-                      title="Удалить блок"
-                      aria-label="Удалить блок"
-                      onClick={() => deleteBlock(b.id)}
-                    >
-                      <CloseGlyph />
-                    </button>
-                    <button
-                      className="ins-icon"
-                      title="Дублировать (⌘D)"
-                      aria-label="Дублировать (⌘D)"
-                      onClick={() => duplicateBlock(b.id)}
-                    >
-                      <CopyGlyph />
-                    </button>
-                    <button
-                      className="ins-icon"
-                      title="Выше"
-                      aria-label="Выше"
-                      disabled={i === 0}
-                      onClick={() => moveBlock(b.id, -1)}
-                    >
-                      <ArrowUpGlyph />
-                    </button>
-                    <button
-                      className="ins-icon"
-                      title="Ниже"
-                      aria-label="Ниже"
-                      disabled={i === slide.blocks.length - 1}
-                      onClick={() => moveBlock(b.id, 1)}
-                    >
-                      <ArrowDownGlyph />
-                    </button>
-                  </div>
-                  <button
-                    className="ins-icon"
-                    aria-expanded={open}
-                    title={open ? 'Свернуть' : 'Развернуть'}
-                    aria-label={open ? 'Свернуть' : 'Развернуть'}
-                    onClick={() => setShut((s) => ({ ...s, [b.id]: open }))}
-                  >
-                    <ChevronGlyph open={open} />
-                  </button>
-                </div>
-              </header>
-
-              {open ? <BlockBody block={b} /> : null}
-            </section>
-          )
-        })}
+      <div className="ins-list">
+        {block ? <section className="ins-block"><header className="ins-head"><span className="ins-name">{slide.blocks.findIndex((b) => b.id === block.id) + 1}. {nameOf(block)}</span></header><BlockBody block={block} /></section>
+          : <p className="ins-note">Выберите слой или добавьте новый блок.</p>}
       </div>
 
       <div className="ins-add">

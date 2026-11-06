@@ -43,18 +43,21 @@ button { cursor: pointer; border: none; background: none; padding: 0; }
 
 .app {
   display: grid;
-  grid-template-rows: 52px 1fr;
-  /* 440px is the inspector width the Figma panel is drawn at */
-  grid-template-columns: 228px minmax(360px, 1fr) 440px;
-  grid-template-areas: 'top top top' 'strip canvas inspector';
+  grid-template-rows: 60px 68px minmax(0, 1fr);
+  grid-template-columns: minmax(320px, 1fr) 252px 440px;
+  grid-template-areas: 'top top top' 'slides slides slides' 'canvas layers inspector';
   height: 100%;
-  /* below this the three columns stop being workable — scroll instead of squash */
-  min-width: 1280px;
+  min-width: 1024px;
 }
 
 @media (max-width: 1360px) {
-  .app { grid-template-columns: 196px minmax(320px, 1fr) 400px; min-width: 1180px; }
+  .app { grid-template-columns: minmax(320px, 1fr) 236px 400px; }
 }
+
+/* The slide rail sits horizontally under the header. */
+.strip-list { flex-direction: row; align-items: center; overflow-x: auto; overflow-y: hidden; }
+.strip-item { flex: 0 0 auto; width: max-content; }
+.strip-head { flex: 0 0 auto; }
 
 .topbar {
   grid-area: top;
@@ -69,23 +72,54 @@ button { cursor: pointer; border: none; background: none; padding: 0; }
 .brand {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
   padding-right: 10px;
   margin-right: 2px;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: -0.2px;
   white-space: nowrap;
 }
-.brand .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent-2); }
+.brand span { color: #00a8ff; text-transform: uppercase; }
+.brand b { color: #fff; font-weight: 700; text-transform: uppercase; }
 
 .strip {
-  grid-area: strip;
-  background: var(--bg-2);
-  border-right: 1px solid var(--line);
+  grid-area: slides;
+  background: #0e1d27;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  min-width: 0;
+  padding: 0 8px;
+}
+.strip-head { order: 2; padding: 0 8px; border: 0; }
+.strip-head .label { display: none; }
+.strip-list { order: 1; flex: 1; min-width: 0; overflow-x: auto; overflow-y: hidden; padding: 8px; flex-direction: row; align-items: center; justify-content: center; }
+.strip-item { width: max-content; border-radius: 7px; }
+.strip-foot { display: none; }
+.strip-add { flex: 0 0 40px; height: 52px; margin-left: 8px; border-radius: 8px; background: rgba(255,255,255,.09); color: #fff; font-size: 24px; }
+.strip-add:hover { background: rgba(255,255,255,.16); }
+
+.layer-list {
+  grid-area: layers;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  min-height: 0;
+  padding: 8px;
+  background: #0e1d27;
+  border-left: 1px solid rgba(255,255,255,.06);
+  border-right: 1px solid rgba(255,255,255,.06);
 }
+.layer-items { display: flex; flex-direction: column; gap: 4px; }
+.layer-list > p { margin: auto 8px 12px; color: var(--ink-3); font-size: 12px; }
+.layer-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; min-height: 36px; padding: 0 8px 0 12px; border-radius: 8px; background: rgba(255,255,255,.09); }
+.layer-row[aria-selected='true'] { background: rgba(0,144,255,.22); color: #1aa3ff; }
+.layer-name { flex: 1; min-width: 0; overflow: hidden; text-align: left; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; font-weight: 600; }
+.layer-actions { display: flex; align-items: center; gap: 3px; }
+.layer-actions button { display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: rgba(255,255,255,.11); }
+.layer-actions button:hover { background: rgba(255,255,255,.22); }
+.layer-actions button:disabled { opacity: .3; cursor: default; }
+.layer-actions svg { width: 12px; height: 12px; }
 
 .canvas-wrap {
   grid-area: canvas;
@@ -260,15 +294,16 @@ input[type='range']::-webkit-slider-thumb {
 .strip-item[data-drop='after']::after {
   content: '';
   position: absolute;
-  left: 4px;
-  right: 4px;
-  height: 3px;
+  top: 4px;
+  bottom: 4px;
+  width: 3px;
   border-radius: 2px;
   background: var(--accent);
   z-index: 3;
 }
-.strip-item[data-drop='before']::before { top: -6px; }
-.strip-item[data-drop='after']::after { bottom: -6px; }
+.strip-item[data-drop='before']::before { left: -5px; }
+.strip-item[data-drop='after']::after { right: -5px; }
+.strip-item .num { min-width: 12px; height: 12px; left: 2px; top: 2px; padding: 0 2px; border-radius: 4px; font-size: 8px; }
 .strip-item .num {
   position: absolute;
   left: 6px;
@@ -1052,3 +1087,8 @@ button.ins-name[aria-pressed='true'] {
   /* «Подзаголовок» is one unbreakable word and needs those pixels back */
   .ins-font { padding: 8px; gap: 8px; grid-template-columns: 38px 1fr; }
 }
+
+/* Keep the slide thumbnails in the compact rail beneath the top bar. */
+.strip-list { flex-direction: row; align-items: center; overflow-x: auto; overflow-y: hidden; }
+.strip-item { flex: 0 0 auto; width: max-content; }
+.strip-head { flex: 0 0 auto; }

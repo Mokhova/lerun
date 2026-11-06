@@ -184,7 +184,7 @@ export const TEXT_VARIANTS: TextVariant[] = [
 
 /* ------------------------------------------------------------------ canvas */
 
-export type FormatId = 'post45' | 'square' | 'story'
+export type FormatId = 'post45' | 'square' | 'landscape169' | 'story'
 
 export type FormatSpec = {
   id: FormatId
@@ -220,6 +220,15 @@ export const FORMATS: Record<FormatId, FormatSpec> = {
     padding: { top: 120, right: 120, bottom: 150, left: 120 },
     footerTop: 988,
   },
+  landscape169: {
+    id: 'landscape169',
+    label: '16:9 — горизонтальный',
+    hint: '1080×608 · горизонтальный формат',
+    width: 1080,
+    height: 608,
+    padding: { top: 48, right: 90, bottom: 64, left: 90 },
+    footerTop: 568,
+  },
   story: {
     id: 'story',
     label: '9:16 — сторис',
@@ -231,7 +240,7 @@ export const FORMATS: Record<FormatId, FormatSpec> = {
   },
 }
 
-export const FORMAT_ORDER: FormatId[] = ['post45', 'square', 'story']
+export const FORMAT_ORDER: FormatId[] = ['post45', 'square', 'landscape169', 'story']
 
 export const contentBox = (f: FormatSpec) => ({
   width: f.width - f.padding.left - f.padding.right,

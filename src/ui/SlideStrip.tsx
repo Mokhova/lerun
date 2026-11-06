@@ -1,13 +1,10 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useEditor } from '../store/useEditor'
 import { FORMATS } from '../design/tokens'
 import { SlideView } from '../render/SlideView'
 import { validate, issuesForSlide } from '../lint/validate'
 
-/** fallback until the column is measured */
-const THUMB_W = 188
-/** .strip-item carries a 2px border on each side */
-const ITEM_BORDER = 2
+const THUMB_H = 52
 const DRAG_SLOP = 5
 /** how close to the list edge a drag has to get before the list follows */
 const EDGE = 48
@@ -23,43 +20,27 @@ export function SlideStrip({ onAdd }: { onAdd: () => void }) {
   const moveSlide = useEditor((s) => s.moveSlide)
 
   const listRef = useRef<HTMLDivElement>(null)
-  const pending = useRef<{ from: number; y: number; moved: boolean } | null>(null)
+  const pending = useRef<{ from: number; x: number; moved: boolean } | null>(null)
   const overRef = useRef<number | null>(null)
-  const pointerY = useRef(0)
+  const pointerX = useRef(0)
   const speed = useRef(0)
   const raf = useRef(0)
   const [from, setFrom] = useState<number | null>(null)
   const [over, setOver] = useState<number | null>(null)
 
   const format = FORMATS[project.format]
-  // the column narrows at 1360px, and a hardcoded width used to be cropped
-  // by 23px there — measure it instead
-  const [thumbW, setThumbW] = useState(THUMB_W)
-  const k = thumbW / format.width
+  const k = THUMB_H / format.height
+  const thumbW = Math.round(format.width * k)
   const issues = useMemo(() => validate(project, overflow), [project, overflow])
 
-  useLayoutEffect(() => {
-    const el = listRef.current
-    if (!el) return
-    const measure = () => {
-      const cs = getComputedStyle(el)
-      const pad = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight)
-      setThumbW(Math.max(80, el.clientWidth - pad - ITEM_BORDER * 2))
-    }
-    measure()
-    const ro = new ResizeObserver(measure)
-    ro.observe(el)
-    return () => ro.disconnect()
-  }, [])
-
   /** Which card is the pointer currently over? */
-  const indexAt = (clientY: number) => {
+  const indexAt = (clientX: number) => {
     const cards = Array.from(
       listRef.current?.querySelectorAll('[data-slide-card]') ?? []
     ) as HTMLElement[]
     for (let i = 0; i < cards.length; i++) {
       const r = cards[i].getBoundingClientRect()
-      if (clientY < r.bottom) return i
+      if (clientX < r.left + r.width / 2) return i
     }
     return cards.length - 1
   }
@@ -69,10 +50,10 @@ export function SlideStrip({ onAdd }: { onAdd: () => void }) {
     const tick = () => {
       const el = listRef.current
       if (el && speed.current) {
-        const before = el.scrollTop
-        el.scrollTop += speed.current
-        if (el.scrollTop !== before) {
-          const target = indexAt(pointerY.current)
+        const before = el.scrollLeft
+        el.scrollLeft += speed.current
+        if (el.scrollLeft !== before) {
+          const target = indexAt(pointerX.current)
           overRef.current = target
           setOver(target)
         }
@@ -83,23 +64,23 @@ export function SlideStrip({ onAdd }: { onAdd: () => void }) {
     const move = (e: MouseEvent) => {
       const p = pending.current
       if (!p) return
-      if (!p.moved && Math.abs(e.clientY - p.y) < DRAG_SLOP) return
+      if (!p.moved && Math.abs(e.clientX - p.x) < DRAG_SLOP) return
       if (!p.moved) {
         p.moved = true
         setFrom(p.from)
         document.body.style.cursor = 'grabbing'
         raf.current = requestAnimationFrame(tick)
       }
-      pointerY.current = e.clientY
+      pointerX.current = e.clientX
       const box = listRef.current?.getBoundingClientRect()
       speed.current = !box
         ? 0
-        : e.clientY < box.top + EDGE
+        : e.clientX < box.left + EDGE
           ? -EDGE_SPEED
-          : e.clientY > box.bottom - EDGE
+          : e.clientX > box.right - EDGE
             ? EDGE_SPEED
             : 0
-      const target = indexAt(e.clientY)
+      const target = indexAt(e.clientX)
       overRef.current = target
       setOver(target)
     }
@@ -142,12 +123,6 @@ export function SlideStrip({ onAdd }: { onAdd: () => void }) {
 
   return (
     <aside className="strip">
-      <div className="strip-head">
-        <span className="label">Слайды {project.slides.length}</span>
-        <button className="btn sm primary" onClick={onAdd} title="Добавить слайд (N)">
-          + Слайд
-        </button>
-      </div>
       <div className="strip-list" ref={listRef}>
         {project.slides.map((slide, i) => {
           const mine = issuesForSlide(issues, slide.id)
@@ -168,7 +143,7 @@ export function SlideStrip({ onAdd }: { onAdd: () => void }) {
                 if (e.button !== 0) return
                 if ((e.target as HTMLElement).closest('.tools')) return
                 e.preventDefault()
-                pending.current = { from: i, y: e.clientY, moved: false }
+                pending.current = { from: i, x: e.clientX, moved: false }
               }}
               onClick={() => {
                 if (from === null) selectSlide(slide.id)
@@ -231,8 +206,8 @@ export function SlideStrip({ onAdd }: { onAdd: () => void }) {
             </div>
           )
         })}
+        <button className="strip-add" onClick={onAdd} title="Добавить слайд (N)" aria-label="Добавить слайд">+</button>
       </div>
-      <p className="strip-foot">Слайды можно перетаскивать мышью · ↑↓ — переключение</p>
     </aside>
   )
 }

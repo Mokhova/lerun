@@ -42,7 +42,7 @@ export function TopBar({
   return (
     <header className="topbar">
       <div className="brand">
-        Lerun
+        <span>Lucent</span><b>&amp; Lerun</b>
       </div>
 
       <input
@@ -53,13 +53,13 @@ export function TopBar({
         placeholder="Название карусели"
       />
 
-      <div style={{ width: 300 }}>
+      <div style={{ width: 240 }}>
         <Seg
           value={project.format}
           onChange={setFormat}
           options={FORMAT_ORDER.map((f) => ({
             value: f,
-            label: f === 'post45' ? '4:5' : f === 'square' ? '1:1' : '9:16',
+            label: f === 'post45' ? '4:5' : f === 'square' ? '1:1' : f === 'landscape169' ? '16:9' : '9:16',
             title: FORMATS[f].hint,
           }))}
         />
