@@ -9,6 +9,7 @@ import { importPhoto } from '../lib/image'
 type Drag =
   | { kind: 'pan'; startX: number; startY: number; ox: number; oy: number; moved: boolean }
   | { kind: 'block'; id: string; from: number; startY: number; moved: boolean }
+  | { kind: 'pattern'; id: string; startX: number; startY: number; ox: number; oy: number; moved: boolean }
 
 export function Canvas() {
   const slide = useSlide()
@@ -24,6 +25,7 @@ export function Canvas() {
   const dropPhoto = useEditor((s) => s.dropPhoto)
   const updatePhoto = useEditor((s) => s.updatePhoto)
   const moveBlockTo = useEditor((s) => s.moveBlockTo)
+  const updatePattern = useEditor((s) => s.updatePattern)
   const fileRef = useRef<HTMLInputElement>(null)
 
   const wrapRef = useRef<HTMLDivElement>(null)
@@ -61,6 +63,14 @@ export function Canvas() {
     const move = (e: MouseEvent) => {
       const d = drag.current
       if (!d) return
+      if (d.kind === 'pattern') {
+        const dx = e.clientX - d.startX
+        const dy = e.clientY - d.startY
+        if (!d.moved && Math.abs(dx) + Math.abs(dy) < 4) return
+        d.moved = true
+        updatePattern(d.id, { x: Math.round(d.ox + dx / k), y: Math.round(d.oy + dy / k) })
+        return
+      }
       if (d.kind === 'block') {
         if (!d.moved && Math.abs(e.clientY - d.startY) < 4) return
         if (!d.moved) {
@@ -108,7 +118,7 @@ export function Canvas() {
       window.removeEventListener('mouseup', up)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [k, updatePhoto, moveBlockTo, format.width, format.height])
+  }, [k, updatePhoto, updatePattern, moveBlockTo, format.width, format.height])
 
   useEffect(() => {
     const onWheel = (e: WheelEvent) => {
@@ -232,9 +242,7 @@ export function Canvas() {
           />
         </div>
 
-        {/* Picking a pattern lives outside the exported node. Nothing here
-            moves it — placement is a named setting, so there is no drag to
-            mis-aim — and the layer is clipped so no frame leaves the slide. */}
+        {/* Handles stay outside the exported slide while patterns can be dragged. */}
         {showPatternTools ? (
           <div className="pattern-layer">
             {slide.patterns.map((p) => {
@@ -253,7 +261,15 @@ export function Canvas() {
                     transform: `rotate(${p.rotation}deg)`,
                   }}
                   title={PATTERN_BY_ID[p.pattern].label}
+                  data-pattern-id={p.id}
                   onClick={() => selectPattern(p.id)}
+                  onMouseDown={(e) => {
+                    if (e.button !== 0) return
+                    e.preventDefault()
+                    e.stopPropagation()
+                    selectPattern(p.id)
+                    drag.current = { kind: 'pattern', id: p.id, startX: e.clientX, startY: e.clientY, ox: p.x, oy: p.y, moved: false }
+                  }}
                 />
               )
             })}

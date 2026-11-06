@@ -116,7 +116,7 @@ export type EditorState = {
   deleteItem: (blockId: string, itemId: string) => void
   moveItem: (blockId: string, itemId: string, dir: -1 | 1) => void
 
-  addPattern: (pattern: PatternId) => void
+  addPattern: (pattern: PatternId, patch?: Partial<PatternInstance>) => void
   /** arrow keys: send a pattern to the next named spot in that direction */
   movePatternBy: (patternId: string, dx: -1 | 0 | 1, dy: -1 | 0 | 1) => void
   updatePattern: (patternId: string, patch: Partial<PatternInstance>) => void
@@ -472,7 +472,7 @@ export const useEditor = create<EditorState>((set, get) => {
         b.items.splice(j, 0, it)
       }),
 
-    addPattern: (pattern) => {
+    addPattern: (pattern, patch = {}) => {
       const def = PATTERNS.find((p) => p.id === pattern)!
       const format = FORMATS[get().project.format]
       const spot = PATTERN_SPOTS.find((s) => s.id === DEFAULT_SPOT)!
@@ -481,6 +481,7 @@ export const useEditor = create<EditorState>((set, get) => {
         blur: def.blur,
         x: Math.round(format.width * spot.fx),
         y: Math.round(format.height * spot.fy),
+        ...patch,
       })
       withSlide((s) => void s.patterns.push(inst))
       set((s) => ({ sel: { ...s.sel, patternId: inst.id, blockId: null }, panel: 'decor' }))

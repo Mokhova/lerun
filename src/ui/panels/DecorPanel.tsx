@@ -90,6 +90,20 @@ export function DecorPanel() {
 
   return (
     <div className="panel">
+      <button
+        className="btn primary"
+        style={{ width: '100%', marginBottom: 12 }}
+        onClick={() => {
+          const p = PATTERNS[Math.floor(Math.random() * PATTERNS.length)]
+          addPattern(p.id, {
+            x: Math.round(format.width * (0.15 + Math.random() * 0.7)),
+            y: Math.round(format.height * (0.15 + Math.random() * 0.7)),
+            rotation: Math.round(Math.random() * 360),
+          })
+        }}
+      >
+        ✨ Сделать красиво
+      </button>
       <Section title="Шум">
         <Seg
           value={slide.noise}

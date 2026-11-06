@@ -143,7 +143,7 @@ export function SlideStrip({ onAdd }: { onAdd: () => void }) {
   return (
     <aside className="strip">
       <div className="strip-head">
-        <span className="label">Слайды · {project.slides.length}</span>
+        <span className="label">Слайды {project.slides.length}</span>
         <button className="btn sm primary" onClick={onAdd} title="Добавить слайд (N)">
           + Слайд
         </button>

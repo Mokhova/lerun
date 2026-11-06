@@ -42,7 +42,6 @@ export function TopBar({
   return (
     <header className="topbar">
       <div className="brand">
-        <span className="dot" />
         Lerun
       </div>
 
@@ -60,7 +59,7 @@ export function TopBar({
           onChange={setFormat}
           options={FORMAT_ORDER.map((f) => ({
             value: f,
-            label: FORMATS[f].label,
+            label: f === 'post45' ? '4:5' : f === 'square' ? '1:1' : '9:16',
             title: FORMATS[f].hint,
           }))}
         />
@@ -70,8 +69,8 @@ export function TopBar({
 
       {save ? (
         <span className="save-state" data-state={save.state}>
-          <i />
-          {save.label}
+          <i aria-hidden="true">{save.state === 'saved' ? '✓' : ''}</i>
+          {save.state === 'saved' ? '' : save.label}
         </span>
       ) : null}
 
