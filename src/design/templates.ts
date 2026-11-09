@@ -172,7 +172,7 @@ export const TEMPLATES: Template[] = [
   {
     id: 'coverSans',
     name: 'Обложка-плакат',
-    hint: 'Жирный Montserrat во весь слайд',
+    hint: 'Жирный Gilroy во весь слайд',
     make: (t) =>
       base(t, 'Обложка', [makeText('h1', 'Как научиться\nговорить «нет»', t.text)], {
         distribute: 'center',

@@ -56,9 +56,10 @@ export const FIGMA_BLUR = 0.3
 export type FontFamily = 'display' | 'sans' | 'sansAlt'
 
 export const FONT_STACK: Record<FontFamily, string> = {
-  display: "'Rhythmic RUS', 'Montserrat', sans-serif",
-  sans: "'Montserrat', sans-serif",
-  sansAlt: "'Montserrat Alternates', 'Montserrat', sans-serif",
+  display: "'Rhythmic RUS', 'Gilroy', 'Montserrat', sans-serif",
+  // The supplied Gilroy files contain Cyrillic glyphs; Montserrat fills Latin glyphs.
+  sans: "'Gilroy', 'Montserrat', sans-serif",
+  sansAlt: "'Montserrat Alternates', 'Montserrat', 'Gilroy', sans-serif",
 }
 
 export type TextVariant =
@@ -112,7 +113,7 @@ export const TYPE_SCALE: Record<TextVariant, TypeSpec> = {
   h1: {
     id: 'h1',
     label: 'Крупный заголовок',
-    hint: 'Montserrat ExtraBold · 96/88',
+    hint: 'Gilroy Bold · 96/88',
     family: 'sans',
     size: 96,
     lineHeight: 88,
@@ -122,7 +123,7 @@ export const TYPE_SCALE: Record<TextVariant, TypeSpec> = {
   h2: {
     id: 'h2',
     label: 'Заголовок',
-    hint: 'Montserrat ExtraBold · 80/80',
+    hint: 'Gilroy Bold · 80/80',
     family: 'sans',
     size: 80,
     lineHeight: 80,
@@ -132,7 +133,7 @@ export const TYPE_SCALE: Record<TextVariant, TypeSpec> = {
   h3: {
     id: 'h3',
     label: 'Подзаголовок',
-    hint: 'Montserrat Bold · 60/54',
+    hint: 'Gilroy Bold · 60/54',
     family: 'sans',
     size: 60,
     lineHeight: 54,
@@ -142,7 +143,7 @@ export const TYPE_SCALE: Record<TextVariant, TypeSpec> = {
   bodyL: {
     id: 'bodyL',
     label: 'Текст крупный',
-    hint: 'Montserrat Medium · 44/48',
+    hint: 'Gilroy Medium · 44/48',
     family: 'sans',
     size: 44,
     lineHeight: 48,
@@ -152,7 +153,7 @@ export const TYPE_SCALE: Record<TextVariant, TypeSpec> = {
   body: {
     id: 'body',
     label: 'Текст',
-    hint: 'Montserrat Medium · 40/44',
+    hint: 'Gilroy Medium · 40/44',
     family: 'sans',
     size: 40,
     lineHeight: 44,
@@ -162,7 +163,7 @@ export const TYPE_SCALE: Record<TextVariant, TypeSpec> = {
   caption: {
     id: 'caption',
     label: 'Сноска',
-    hint: 'Montserrat Regular · 32/32',
+    hint: 'Gilroy Regular · 32/32',
     family: 'sans',
     size: 32,
     lineHeight: 32,

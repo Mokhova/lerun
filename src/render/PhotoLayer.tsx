@@ -17,7 +17,7 @@ const Placeholder = ({ label }: { label: string }) => (
       background: 'rgba(128,128,128,0.18)',
       border: '4px dashed rgba(128,128,128,0.55)',
       color: 'rgba(128,128,128,1)',
-      fontFamily: "'Montserrat', sans-serif",
+      fontFamily: "'Gilroy', 'Montserrat', sans-serif",
       fontWeight: 600,
       fontSize: 34,
       textAlign: 'center',

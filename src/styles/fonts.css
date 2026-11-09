@@ -8,6 +8,46 @@
   src: url(/fonts/Rhythmic_RUS.woff2) format('woff2');
 }
 
+@font-face {
+  font-family: 'SONGER';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(/fonts/SONGER-C-Regular.otf) format('opentype');
+}
+
+@font-face {
+  font-family: 'Gilroy';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(/fonts/Gilroy-Regular-cyr.woff2) format('woff2');
+}
+
+@font-face {
+  font-family: 'Gilroy';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(/fonts/Gilroy-Medium-cyr.woff2) format('woff2');
+}
+
+@font-face {
+  font-family: 'Gilroy';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(/fonts/Gilroy-Bold-cyr.woff2) format('woff2');
+}
+
+@font-face {
+  font-family: 'Gilroy';
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+  src: url(/fonts/Gilroy-BoldItalic-cyr.woff2) format('woff2');
+}
+
 /* cyrillic-ext */
 @font-face {
   font-family: 'Montserrat';

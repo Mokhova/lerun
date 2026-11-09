@@ -418,14 +418,14 @@ function QuoteBody({ block }: { block: QuoteBlock }) {
         <div className="ins-chips">
           <Chip
             on={block.style === 'center'}
-            title="Montserrat ExtraBold 96/88"
+            title="Gilroy Bold 96/88"
             onClick={() => update(block.id, { style: 'center' })}
           >
             Центр
           </Chip>
           <Chip
             on={block.style === 'topLeft'}
-            title="Montserrat ExtraBold 80/80"
+            title="Gilroy Bold 80/80"
             onClick={() => update(block.id, { style: 'topLeft' })}
           >
             Слева
@@ -523,7 +523,7 @@ function CaptionBody({ block }: { block: CaptionBlock }) {
           placeholder="Подпись"
           onChange={(e) => update(block.id, { text: e.target.value })}
         />
-        <p className="ins-note">Montserrat Bold · 44/48, по центру</p>
+        <p className="ins-note">Gilroy Bold · 44/48, по центру</p>
       </div>
 
       <Palette

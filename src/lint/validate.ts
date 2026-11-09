@@ -3,7 +3,7 @@ import { FORMATS, TYPE_SCALE, contrast, hex } from '../design/tokens'
 
 /**
  * Glyphs that Rhythmic RUS does not contain. The browser silently falls back
- * to Montserrat for them, which looks like a mistake — so we flag it.
+ * to Gilroy for them, which looks like a mistake — so we flag it.
  */
 const DISPLAY_MISSING = ['“', '”', '–', '[', ']', '№', '\\', '`']
 

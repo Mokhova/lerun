@@ -214,7 +214,7 @@ export function StylePanel() {
           onChange={(e) => setFooterText(e.target.value)}
           placeholder="тгк Рефлексант"
         />
-        <p className="hint">Montserrat 32/32, 50 % прозрачности — как в макете.</p>
+        <p className="hint">Gilroy 32/32, 50 % прозрачности — как в макете.</p>
       </Section>
     </div>
   )
