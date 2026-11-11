@@ -1,16 +1,15 @@
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { useEditor } from '../store/useEditor'
-import { FORMATS, FORMAT_ORDER } from '../design/tokens'
+import { FORMATS } from '../design/tokens'
 import { readProjectJson } from '../export/exportImage'
 import { Seg } from './controls'
+import { SaveCheckIcon, TextSparkleIcon, UndoIcon } from './icons'
 
 export function TopBar({
-  onTemplates,
   onTextImport,
   onExport,
   toast,
 }: {
-  onTemplates: () => void
   onTextImport: () => void
   onExport: () => void
   toast: (m: string) => void
@@ -19,14 +18,28 @@ export function TopBar({
   const setTitle = useEditor((s) => s.setTitle)
   const setFormat = useEditor((s) => s.setFormat)
   const undo = useEditor((s) => s.undo)
-  const redo = useEditor((s) => s.redo)
   const canUndo = useEditor((s) => s.past.length > 0)
-  const canRedo = useEditor((s) => s.future.length > 0)
   const replaceProject = useEditor((s) => s.replaceProject)
   const resetProject = useEditor((s) => s.resetProject)
   const saveState = useEditor((s) => s.saveState)
   const storage = useEditor((s) => s.storage)
   const fileRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    const onShortcut = (event: KeyboardEvent) => {
+      if (!(event.metaKey || event.ctrlKey)) return
+      const key = event.key.toLowerCase()
+      if (key === 'o') {
+        event.preventDefault()
+        fileRef.current?.click()
+      } else if (key === 'n') {
+        event.preventDefault()
+        if (confirm('Начать новую карусель? Текущая будет заменена.')) resetProject()
+      }
+    }
+    window.addEventListener('keydown', onShortcut)
+    return () => window.removeEventListener('keydown', onShortcut)
+  }, [resetProject])
 
   const save =
     storage !== 'ok'
@@ -42,63 +55,56 @@ export function TopBar({
   return (
     <header className="topbar">
       <div className="brand">
-        <span>Lucent</span><b>&amp; Lerun</b>
+        <span>Lucent</span><b>&amp; lERUN</b>
       </div>
 
-      <input
-        className="field"
-        style={{ width: 210 }}
-        value={project.title}
-        onChange={(e) => setTitle(e.target.value)}
-        placeholder="Название карусели"
-      />
+      <div className="topbar-main">
+        <div className="topbar-set">
+          <input
+            className="field topbar-title"
+            value={project.title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Новая карусель"
+          />
+          <div className="topbar-format">
+            <Seg
+              value={project.format}
+              onChange={setFormat}
+              options={(['post45', 'square', 'landscape169'] as const).map((f) => ({
+                value: f,
+                label: f === 'post45' ? '4:5' : f === 'square' ? '1:1' : '16:9',
+                title: FORMATS[f].hint,
+              }))}
+            />
+          </div>
+        </div>
 
-      <div style={{ width: 240 }}>
-        <Seg
-          value={project.format}
-          onChange={setFormat}
-          options={FORMAT_ORDER.map((f) => ({
-            value: f,
-            label: f === 'post45' ? '4:5' : f === 'square' ? '1:1' : f === 'landscape169' ? '16:9' : '9:16',
-            title: FORMATS[f].hint,
-          }))}
-        />
-      </div>
-
-      <div style={{ flex: 1 }} />
-
-      {save ? (
-        <span className="save-state" data-state={save.state}>
-          <i aria-hidden="true">{save.state === 'saved' ? '✓' : ''}</i>
-          {save.state === 'saved' ? '' : save.label}
-        </span>
-      ) : null}
-
-      <button className="btn ghost" onClick={onTextImport} title="Вставить текст поста">
-        Текст → карусель
-      </button>
-      <button className="btn ghost" onClick={onTemplates} title="Шаблоны слайдов (N)">
-        Шаблоны
-      </button>
-      <div className="row" style={{ gap: 2 }}>
-        <button
-          className="btn ghost icon"
-          onClick={undo}
-          disabled={!canUndo}
-          title="Отменить ⌘Z"
-          aria-label="Отменить"
-        >
-          ↶
-        </button>
-        <button
-          className="btn ghost icon"
-          onClick={redo}
-          disabled={!canRedo}
-          title="Вернуть ⇧⌘Z"
-          aria-label="Вернуть"
-        >
-          ↷
-        </button>
+        <div className="topbar-actions">
+          <span
+            className="save-state"
+            data-state={save?.state ?? 'saving'}
+            title={save?.label ?? 'Сохраняю…'}
+            aria-label={save?.label ?? 'Сохраняю…'}
+          >
+            <SaveCheckIcon />
+          </span>
+          <button
+            className="topbar-icon"
+            onClick={undo}
+            disabled={!canUndo}
+            title="Отменить ⌘Z"
+            aria-label="Отменить"
+          >
+            <UndoIcon />
+          </button>
+          <button className="topbar-text" onClick={onTextImport} title="Вставить текст поста">
+            <TextSparkleIcon />
+            <span>Текст на слайды</span>
+          </button>
+          <button className="topbar-export" onClick={onExport} title="Выгрузить ⌘E">
+            Экспорт
+          </button>
+        </div>
       </div>
 
       <input
@@ -118,20 +124,6 @@ export function TopBar({
           }
         }}
       />
-      <button className="btn ghost" onClick={() => fileRef.current?.click()} title="Открыть .json">
-        Открыть
-      </button>
-      <button
-        className="btn ghost"
-        onClick={() => {
-          if (confirm('Начать новую карусель? Текущая будет заменена.')) resetProject()
-        }}
-      >
-        Новая
-      </button>
-      <button className="btn primary" onClick={onExport} title="Выгрузить ⌘E">
-        Экспорт
-      </button>
     </header>
   )
 }

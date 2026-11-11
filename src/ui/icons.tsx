@@ -47,16 +47,22 @@ export const ChevronGlyph = ({ open }: { open: boolean }) => (
   </svg>
 )
 
-/** Exported straight from the design file — never recoloured or resized. */
-export const GridIcon = () => <img src={`${import.meta.env.BASE_URL}icons/grid.svg`} width={16} height={16} alt="" />
+/** Icons exported from the target Figma frame. Their intrinsic dimensions match the design. */
+const figmaIcon = (name: string) => `${import.meta.env.BASE_URL}figma/${name}`
+
+export const SaveCheckIcon = () => <img src={figmaIcon('save-check.svg')} width={24} height={25} alt="" />
+export const UndoIcon = () => <img src={figmaIcon('undo.svg')} width={24} height={25} alt="" />
+export const TextSparkleIcon = () => <img src={figmaIcon('text-sparkle.svg')} width={15} height={19} alt="" />
+export const AddIcon = () => <img src={figmaIcon('add.svg')} width={24} height={24} alt="" />
+export const GridIcon = () => <img src={figmaIcon('grid.svg')} width={16} height={16} alt="" />
 export const AlignLeftIcon = () => (
-  <img src={`${import.meta.env.BASE_URL}icons/align-left.svg`} width={16} height={16} alt="" />
+  <img src={figmaIcon('align-left.svg')} width={16} height={16} alt="" />
 )
 export const AlignCenterIcon = () => (
-  <img src={`${import.meta.env.BASE_URL}icons/align-center.svg`} width={16} height={16} alt="" />
+  <img src={figmaIcon('align-center.svg')} width={16} height={16} alt="" />
 )
 export const AlignRightIcon = () => (
-  <img src={`${import.meta.env.BASE_URL}icons/align-right.svg`} width={16} height={16} alt="" />
+  <img src={figmaIcon('align-right.svg')} width={16} height={16} alt="" />
 )
-export const OpacityIcon = () => <img src={`${import.meta.env.BASE_URL}icons/opacity.svg`} width={16} height={16} alt="" />
-export const CapsIcon = () => <img src={`${import.meta.env.BASE_URL}icons/caps.svg`} width={13.0516} height={7} alt="" />
+export const OpacityIcon = () => <img src={figmaIcon('opacity.svg')} width={16} height={16} alt="" />
+export const CapsIcon = () => <img src={figmaIcon('caps.svg')} width={13.0516} height={7} alt="" />

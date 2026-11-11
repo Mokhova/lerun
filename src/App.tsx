@@ -99,7 +99,7 @@ export default function App() {
       }
       if (typing) return
 
-      if (e.key === 'n' || e.key === 'т') {
+      if (!mod && (e.key === 'n' || e.key === 'т')) {
         e.preventDefault()
         setDialog('templates')
         return
@@ -168,7 +168,6 @@ export default function App() {
   return (
     <div className="app">
       <TopBar
-        onTemplates={() => setDialog('templates')}
         onTextImport={() => setDialog('text')}
         onExport={() => setDialog('export')}
         toast={toast}

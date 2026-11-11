@@ -3,6 +3,7 @@ import { useEditor } from '../store/useEditor'
 import { FORMATS } from '../design/tokens'
 import { SlideView } from '../render/SlideView'
 import { validate, issuesForSlide } from '../lint/validate'
+import { AddIcon } from './icons'
 
 const THUMB_H = 52
 const DRAG_SLOP = 5
@@ -206,7 +207,7 @@ export function SlideStrip({ onAdd }: { onAdd: () => void }) {
             </div>
           )
         })}
-        <button className="strip-add" onClick={onAdd} title="Добавить слайд (N)" aria-label="Добавить слайд">+</button>
+        <button className="strip-add" onClick={onAdd} title="Добавить слайд" aria-label="Добавить слайд"><AddIcon /></button>
       </div>
     </aside>
   )

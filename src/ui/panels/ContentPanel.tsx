@@ -36,10 +36,6 @@ const BLOCK_LABEL: Record<BlockType, string> = {
   spacer: 'Отступ',
 }
 
-/** A text block is named by the style it carries — that is what «1. Заголовок» means. */
-const nameOf = (b: Block) =>
-  b.type === 'text' ? TYPE_SCALE[b.variant].label : BLOCK_LABEL[b.type]
-
 /* ----------------------------------------------------------------- pieces */
 
 function Sec({ title, children }: { title: string; children: ReactNode }) {
@@ -93,10 +89,18 @@ function Palette({
  * True quarter-scale put three of the eight at 11, 10 and 8px — the smallest
  * read as an empty tile, and the two most-used styles differed by one pixel.
  */
-const sampleSize = (size: number) => {
-  const [lo, hi] = [32, 144]
-  const [min, max] = [14, 30]
-  return Math.round((min + ((size - lo) / (hi - lo)) * (max - min)) * 10) / 10
+const FONT_PREVIEW: Record<
+  TextVariant,
+  { text: string; size: number; lineHeight: number; color?: string; transform?: 'uppercase' }
+> = {
+  displayXL: { text: 'Аа', size: 36, lineHeight: 29, transform: 'uppercase' },
+  display: { text: 'Аа', size: 20, lineHeight: 16 },
+  h1: { text: 'Аа', size: 24, lineHeight: 22 },
+  h2: { text: 'Аа', size: 20, lineHeight: 20 },
+  h3: { text: 'Аа', size: 15, lineHeight: 13.5 },
+  bodyL: { text: 'Тт', size: 10, lineHeight: 11 },
+  body: { text: 'Тт', size: 8, lineHeight: 8, color: 'rgba(16,24,32,.5)' },
+  caption: { text: 'Тт', size: 8, lineHeight: 8, color: 'rgba(16,24,32,.5)' },
 }
 
 /** The type ramp. Each tile shows the real face and says what it is. */
@@ -111,13 +115,14 @@ function TypePicker({
   // the block already carries it, so an old project still reads correctly
   const onFirstSlide = useEditor((s) => s.project.slides[0]?.id === s.sel.slideId)
   const offered = TEXT_VARIANTS.filter(
-    (v) => v !== 'displayXL' || onFirstSlide || value === 'displayXL'
+    (v) => v !== 'caption' && (v !== 'displayXL' || onFirstSlide || value === 'displayXL')
   )
 
   return (
     <div className="ins-fonts">
       {offered.map((v) => {
         const t = TYPE_SCALE[v]
+        const preview = FONT_PREVIEW[v]
         return (
           <button
             key={v}
@@ -131,11 +136,13 @@ function TypePicker({
               style={{
                 fontFamily: FONT_STACK[t.family],
                 fontWeight: t.weight,
-                fontSize: sampleSize(t.size),
-                textTransform: v === 'displayXL' ? 'uppercase' : undefined,
+                color: preview.color,
+                fontSize: preview.size,
+                lineHeight: `${preview.lineHeight}px`,
+                textTransform: preview.transform,
               }}
             >
-              Аа
+              {preview.text}
             </span>
             <span className="name">{t.label}</span>
           </button>
@@ -157,7 +164,7 @@ export function ContentPanel() {
   return (
     <div className="panel">
       <div className="ins-list">
-        {block ? <section className="ins-block"><header className="ins-head"><span className="ins-name">{slide.blocks.findIndex((b) => b.id === block.id) + 1}. {nameOf(block)}</span></header><BlockBody block={block} /></section>
+        {block ? <section className="ins-block"><BlockBody block={block} /></section>
           : <p className="ins-note">Выберите слой или добавьте новый блок.</p>}
       </div>
 
@@ -205,7 +212,6 @@ function TextBody({ block }: { block: TextBlock }) {
 
       <Sec title="Шрифт">
         <TypePicker value={block.variant} onChange={(variant) => update(block.id, { variant })} />
-        <p className="ins-note">{spec.hint}</p>
       </Sec>
 
       <Palette title="Цвет" value={block.color} onChange={(c) => update(block.id, { color: c })} />

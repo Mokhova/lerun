@@ -44,10 +44,14 @@ export function Canvas() {
     const el = wrapRef.current
     if (!el) return
     const recompute = () => {
-      const pad = 72
+      // The Figma work area leaves 86px on each side of the 564px canvas
+      // column and 92px above/below the 704px workspace. Keep the preview at
+      // that scale when zoom is set to Fit.
+      const padX = 172
+      const padY = 184
       const k = Math.min(
-        (el.clientWidth - pad) / format.width,
-        (el.clientHeight - pad) / format.height
+        (el.clientWidth - padX) / format.width,
+        (el.clientHeight - padY) / format.height
       )
       setFit(Math.max(0.1, Math.min(1, k)))
     }

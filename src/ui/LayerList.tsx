@@ -29,6 +29,5 @@ export function LayerList() {
         </div>
       </div>)}
     </div>
-    <p>Слои слайда</p>
   </aside>
 }

@@ -51,6 +51,7 @@ export function Inspector() {
           aria-pressed={showGuides}
           onClick={toggleGuides}
           title="Показать безопасную зону слайда"
+          aria-label="Показать безопасную зону слайда"
         >
           <GridIcon />
           <span>Сетка</span>
